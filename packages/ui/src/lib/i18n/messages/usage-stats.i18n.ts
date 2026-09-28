@@ -120,7 +120,7 @@ export const usageStatsI18n = {
     'usageStats.tools.unfinished': 'Onvoltooid',
     'usageStats.tools.rowStats': 'aanroepen: {count} · mediaan: {duration}',
     'usageStats.tools.rowStatsNoDuration': 'aanroepen: {count}',
-    'usageStats.tools.caption': 'Ze tellen leest elk bericht in de periode, dus ze worden op aanvraag geladen.',
+    'usageStats.tools.caption': 'Om ze te tellen wordt elk bericht in de periode gelezen, dus ze worden op aanvraag geladen.',
     'usageStats.tools.load': 'Toolaanroepen tonen',
     'usageStats.tools.loadFailed': 'Kan toolaanroepen niet laden',
   },

@@ -105,6 +105,9 @@ export const routingI18n = {
     'settings.sessions.permissions.explain.safetyUnavailable': 'Needs Jev, which needs a classification provider: the free OpenCode Zen promotion, a Zen API key in OpenCode, or a TypeSafe key.',
   },
   nl: {
+    'settings.classification.card.off': 'Uit',
+    'settings.classification.source.off.name': 'Uit',
+    'settings.classification.source.off.description': 'Er wordt nergens iets naartoe gestuurd. Het vangnet en Auto zijn verborgen, en sessies worden alleen naar werk verplaatst wanneer u ze zelf verplaatst.',
     'chat.modelControls.autoModel': 'Auto',
     'chat.permissionCard.heldBySafetyNet': 'Het vangnet heeft deze actie tegengehouden zodat u kunt beslissen',
     'routing.safetyKind.readOnly': 'alleen-lezen',

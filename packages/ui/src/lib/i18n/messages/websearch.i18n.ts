@@ -47,7 +47,7 @@ export const webSearchI18n = {
     'chat.webSearch.provider': 'Gezocht met {provider}',
     'chat.webSearchConsent.title': 'Webzoeken toestaan?',
     'chat.webSearchConsent.providerTitle': 'Kies een zoekprovider',
-    'chat.webSearchConsent.explanation': 'De agent wil het web doorzoeken naar actuele informatie. Zoekopdragen gaan naar een externe zoekprovider.',
+    'chat.webSearchConsent.explanation': 'De agent wil het web doorzoeken naar actuele informatie. Zoekopdrachten gaan naar een externe zoekprovider.',
     'chat.webSearchConsent.providerExplanation': 'Zoekopdrachten gaan vanaf nu via de provider die u kiest.',
     'chat.webSearchConsent.allow': 'Toestaan',
     'chat.webSearchConsent.choose': 'Provider kiezen',
