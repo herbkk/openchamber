@@ -353,12 +353,12 @@ export const serviceProvides = (
  * What a guest may do beyond drawing its own panel. The user approves the
  * full list once, when the package is installed; a later package that asks
  * for more is re-approved. `prompt`, `sessions`, `files`, and `model` are
- * declared under `contributes.capabilities`; `service`, `network`, and
- * `filesystem` follow from `contributes.service`, `contributes.integration`,
- * and `contributes.filesystem`. `model` is one-off text generation with the
+ * declared under `contributes.capabilities`; `service`, `network`,
+ * `filesystem` and `origins` follow from `contributes.service`,
+ * `contributes.integration`, `contributes.filesystem` and `contributes.origins`. `model` is one-off text generation with the
  * user's Small Model (`host.generate`), outside any session.
  */
-export const GUEST_CAPABILITIES = ['prompt', 'sessions', 'files', 'model', 'conversation', 'service', 'network', 'filesystem'] as const;
+export const GUEST_CAPABILITIES = ['prompt', 'sessions', 'files', 'model', 'conversation', 'service', 'network', 'filesystem', 'origins'] as const;
 
 export type GuestCapability = (typeof GUEST_CAPABILITIES)[number];
 
@@ -366,6 +366,9 @@ export const DECLARED_GUEST_CAPABILITIES = ['prompt', 'sessions', 'files', 'mode
 
 /** The capabilities a manifest may ask for directly. */
 export type DeclaredGuestCapability = (typeof DECLARED_GUEST_CAPABILITIES)[number];
+
+/** How many `contributes.origins` a package may declare. */
+export const GUEST_ORIGINS_MAX = 8;
 
 /** How many `contributes.filesystem` patterns a package may declare. */
 export const GUEST_FILESYSTEM_PATTERNS_MAX = 16;
@@ -403,6 +406,11 @@ export type OpenChamberContributes = {
   service?: ServiceContribution;
   /** Paths outside the project the panel may read and write. Grants `filesystem`. */
   filesystem?: string[];
+  /**
+   * https origins the frame may exchange data with directly: fetch, images,
+   * fonts, styles and media, never scripts. Grants `origins`, approved per list.
+   */
+  origins?: string[];
   /** Menu entries on messages and sessions. */
   actions?: GuestActionContribution[];
   /** Composer slash commands that attach a chip. */
@@ -425,13 +433,14 @@ export type PublicGuestCapabilities = {
 };
 
 export const requestedGuestCapabilities = (
-  contributes: Pick<OpenChamberContributes, 'capabilities' | 'integration' | 'service' | 'filesystem' | 'actions'>,
+  contributes: Pick<OpenChamberContributes, 'capabilities' | 'integration' | 'service' | 'filesystem' | 'actions' | 'origins'>,
 ): GuestCapability[] => {
   const declared = new Set<GuestCapability>(contributes.capabilities ?? []);
   if (guestActionsNeedConversation(contributes.actions)) declared.add('conversation');
   if (contributes.service) declared.add('service');
   if (contributes.integration) declared.add('network');
   if (contributes.filesystem && contributes.filesystem.length > 0) declared.add('filesystem');
+  if (contributes.origins && contributes.origins.length > 0) declared.add('origins');
   return GUEST_CAPABILITIES.filter((capability) => declared.has(capability));
 };
 
@@ -531,6 +540,7 @@ export type ParseManifestErrorCode =
   | 'invalid-integration'
   | 'invalid-service'
   | 'invalid-filesystem'
+  | 'invalid-origins'
   | 'invalid-actions'
   | 'invalid-commands'
   | 'invalid-tools'

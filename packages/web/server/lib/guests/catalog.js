@@ -284,6 +284,9 @@ export const inspectGuestPackage = async (packageRoot, { openchamberVersion, ski
   if (parsed.manifest.contributes.filesystem?.length) {
     guest.filesystem = [...parsed.manifest.contributes.filesystem];
   }
+  if (parsed.manifest.contributes.origins?.length) {
+    guest.origins = [...parsed.manifest.contributes.origins];
+  }
   if (parsed.manifest.contributes.actions?.length) {
     guest.actions = parsed.manifest.contributes.actions.map((action) => ({ ...action }));
   }
@@ -371,6 +374,10 @@ export const toPublicGuest = (guest) => {
   }
   if (Array.isArray(guest.filesystem) && guest.filesystem.length > 0) {
     row.filesystem = [...guest.filesystem];
+  }
+  // Shown on the approval card: the frame may exchange data with these.
+  if (Array.isArray(guest.origins) && guest.origins.length > 0) {
+    row.origins = [...guest.origins];
   }
   // Actions, commands, and tools are the parsed manifest entries as they
   // are: the UI decides which ones to apply from the grant and the enabled flag.

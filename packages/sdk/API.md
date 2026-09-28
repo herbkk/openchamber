@@ -538,6 +538,9 @@ Frozen on `apiVersion` 1 — named in docs, no host hole yet:
 - Keyboard shortcuts, raw git remotes, magic prompts
 - Second `host.provider` beyond Linear
 - Arbitrary filesystem access from the page (only the open project with `files`, or declared `contributes.filesystem` globs), terminal, pairing, or host React components. A declared `service` is outside these limits: it is a process with the user's rights and no sandbox
+- Network access from the page. Pages run under a Content Security Policy: scripts, styles, images, fonts, media and workers come from the package itself or `data:`/`blob:`, and `fetch` reaches only the package's own files. Ship fonts and images inside the package. To talk to an outside service, use `request` (the integration's `apiOrigin`) or declare up to 8 https origins in `contributes.origins`, for example `"origins": ["https://fonts.example.com"]`. The user approves that list at install, and again when an update adds to it. Approved origins are open to `fetch`, images, fonts, styles and media, never to scripts or workers. A `fetch` whose response you read also needs that server to allow CORS for the `null` origin, since the page's origin is opaque
+
+A navigation of the page itself to another address is refused in the desktop app; don't rely on it anywhere.
 
 Do not go around the guest contract through `RuntimeAPIs`.
 

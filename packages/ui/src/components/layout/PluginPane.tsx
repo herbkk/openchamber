@@ -39,6 +39,7 @@ import { useGuestBadgeStore } from '@/lib/guests/badge-store';
 import { guestMay, isGuestActive } from '@/lib/guests/capabilities';
 import { guestFileOperation } from '@/lib/guests/files';
 import { guestGenerate } from '@/lib/guests/generate';
+import { useConfigStore } from '@/stores/useConfigStore';
 import { openGuestCommit, readCurrentBranch } from '@/lib/guests/open-commit';
 import { getRegisteredRuntimeAPIs } from '@/contexts/runtimeAPIRegistry';
 import { isVSCodeRuntime } from '@/lib/desktop';
@@ -236,7 +237,9 @@ export const PluginPane: React.FC<PluginPaneProps> = ({
   const fileEditorEntry = surface === 'file' && fileEditor
     ? guest?.fileEditors?.find((editor) => editor.id === fileEditor.editorId)?.entry ?? null
     : null;
-  const frameKey = `${guestId}:${guest?.version ?? ''}:${guestEnabled}:service-${guest?.service?.granted ? '1' : '0'}:${guest?.entry ?? ''}:${guest?.backgroundEntry ?? ''}:${guest?.statusEntry ?? ''}:${fileEditorEntry ?? ''}`;
+  // Origins the user approved for this list; the frame policy opens them.
+  const approvedOrigins = guest?.capabilities.granted.includes('origins') ? guest.origins ?? [] : [];
+  const frameKey = `${guestId}:${guest?.version ?? ''}:${guestEnabled}:service-${guest?.service?.granted ? '1' : '0'}:origins-${approvedOrigins.join(',')}:${guest?.entry ?? ''}:${guest?.backgroundEntry ?? ''}:${guest?.statusEntry ?? ''}:${fileEditorEntry ?? ''}`;
 
   // Scoped auth is minted per mount/version/grant and renewed if an existing
   // iframe navigates after expiry. Healthy documents retain their local state.
@@ -250,7 +253,7 @@ export const PluginPane: React.FC<PluginPaneProps> = ({
         : surface === 'dialog' && guest.attachEntry ? guest.attachEntry : guest.entry ?? null
     : null;
   const { src, srcDoc, status: frameStatus, recoverExpiredNavigation, acknowledgeHandshake } = useGuestFrameUrl({
-    guestId, entry: guestEntry, instanceKey: frameKey, enabled: guestEnabled,
+    guestId, entry: guestEntry, instanceKey: frameKey, enabled: guestEnabled, origins: approvedOrigins,
   });
 
   const readyRef = React.useRef(ready);
@@ -606,7 +609,12 @@ export const PluginPane: React.FC<PluginPaneProps> = ({
           if (!guestMay(guestRef.current, 'model')) {
             return Promise.resolve({ ok: false as const, code: 'NOT_GRANTED' as const, message: NOT_GRANTED_MESSAGE });
           }
-          return guestGenerate(guestIdRef.current, request, directoryRef.current || null);
+          return guestGenerate(
+            guestIdRef.current,
+            request,
+            directoryRef.current || null,
+            useConfigStore.getState().currentProviderId || null,
+          );
         },
         setBadge: (count) => {
           if (!guestEnabledRef.current) return;

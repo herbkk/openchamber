@@ -70,6 +70,7 @@ import {
 } from './linux-autostart.mjs';
 import { unsupportedAppSpecificOpenError, validateLocalPath } from './path-open-utils.mjs';
 import { shouldAllowBrowserPanelCertificateError } from './browser-panel-security.mjs';
+import { shouldBlockGuestFrameNavigation } from './guest-frame-navigation.mjs';
 import { createRelayDevTunnelBridge } from './relay-dev-tunnel.mjs';
 import { attachRendererRecovery } from './renderer-recovery.mjs';
 import { mintOutsideFileGrant } from '@openchamber/web/server/lib/fs/routes.js';
@@ -2235,6 +2236,32 @@ const createBrowserWindow = ({ label, restoreGeometry, url, runtimeConfig = {}, 
     if (isAllowedNavigationUrl(url)) return;
     event.preventDefault();
     void shell.openExternal(url).catch(() => {});
+  });
+
+  // An extension frame navigating itself would carry data out in the URL;
+  // refused before the request (see guest-frame-navigation.mjs).
+  browserWindow.webContents.on('will-frame-navigate', (details) => {
+    let frameOrigin;
+    try {
+      frameOrigin = details.frame?.origin;
+    } catch {
+      frameOrigin = undefined;
+    }
+    if (!shouldBlockGuestFrameNavigation({
+      isMainFrame: details.isMainFrame,
+      frameOrigin,
+      url: details.url,
+      isAppOrigin: isAllowedNavigationUrl,
+    })) return;
+    details.preventDefault();
+    let host = '';
+    try {
+      host = new URL(details.url).host;
+    } catch {
+      host = '';
+    }
+    // Only the host: the URL itself may be the data being carried out.
+    log.warn(`[guests] refused an extension frame navigating to ${host || 'an invalid URL'}`);
   });
 
   browserWindow.webContents.setZoomFactor(1);

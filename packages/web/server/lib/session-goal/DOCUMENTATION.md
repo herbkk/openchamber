@@ -157,8 +157,10 @@ before touching the filesystem). Rationale: metadata rides every
      small model answers the same questions as JSON booleans read as 1/0, so
      there is one format and one decision. The long turn is cut to its head
      and, mostly, its tail, where the report sits.
-     Who answers: Jev when `sessionGoalChecker` is `classifier` (the default)
-     and a classification provider can run it (`classifierEndpoint`, owned by
+     Who answers: Jev when `sessionGoalChecker` is `classifier` (an explicit
+     pick; the default is `small-model`, since a classification provider set
+     up for another feature is not consent to audit goals with Jev) and a
+     classification provider can run it (`classifierEndpoint`, owned by
      `../routing`); the small model otherwise, and also when Jev fails this
      time (`restrictToPreferredProvider`, session's own provider/model
      preferred). The check is the SOLE termination authority besides the hard

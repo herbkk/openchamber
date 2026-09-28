@@ -11,6 +11,7 @@ import {
   GUEST_COMMAND_NAME,
   GUEST_FILESYSTEM_PATTERNS_MAX,
   GUEST_FILESYSTEM_PATTERN_MAX,
+  GUEST_ORIGINS_MAX,
   GUEST_SERVICE_PROVIDES,
   GUEST_TOOLS_MAX,
   GUEST_TOOL_COLUMNS_MAX,
@@ -58,6 +59,14 @@ const isHttpsUrl = (value: string): boolean => {
   } catch {
     return false;
   }
+};
+
+// An origin the host writes into the frame's CSP as is: a literal hostname,
+// so no `*` or other CSP syntax can widen what the user approved.
+const APPROVABLE_HOSTNAME = /^[a-z0-9-]+(?:\.[a-z0-9-]+)+$/;
+const isApprovableOrigin = (value: string): boolean => {
+  if (!isHttpsOrigin(value)) return false;
+  return APPROVABLE_HOSTNAME.test(new URL(value).hostname);
 };
 
 const isHttpsOrigin = (value: string): boolean => {
@@ -295,6 +304,9 @@ const contributesSchema = z.object({
   filesystem: z.array(
     z.string().max(GUEST_FILESYSTEM_PATTERN_MAX).refine(isGuestFilesystemPattern),
   ).min(1).max(GUEST_FILESYSTEM_PATTERNS_MAX).optional(),
+  origins: z.array(z.string().trim().refine(isApprovableOrigin)).min(1).max(GUEST_ORIGINS_MAX)
+    .refine((origins) => new Set(origins).size === origins.length, { message: 'origins must be unique' })
+    .optional(),
   actions: actionsSchema.optional(),
   commands: commandsSchema.optional(),
   tools: toolsSchema.optional(),
@@ -315,6 +327,7 @@ const runtimeContributions = (contributes: z.output<typeof contributesSchema>): 
   // without one.
   if (contributes.service !== undefined && !contributes.service.provides?.length && !contributes.service.surface) declared.push('service');
   if (contributes.filesystem !== undefined) declared.push('filesystem');
+  if (contributes.origins !== undefined) declared.push('origins');
   if (contributes.actions !== undefined) declared.push('actions');
   if (contributes.commands !== undefined) declared.push('commands');
   return declared;
@@ -475,6 +488,12 @@ const failureFromIssue = (issue: { path: ReadonlyArray<PropertyKey>; code: strin
     return fail(
       'invalid-filesystem',
       'contributes.filesystem lists 1 to 16 patterns starting with "/" or "~/", without "..", empty segments, or backslashes.',
+    );
+  }
+  if (path.startsWith('contributes.origins')) {
+    return fail(
+      'invalid-origins',
+      `contributes.origins lists 1 to ${GUEST_ORIGINS_MAX} unique https origins like "https://fonts.example.com", without a path.`,
     );
   }
   if (path.startsWith('contributes.actions')) {

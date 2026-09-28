@@ -39,6 +39,8 @@ export type InstalledGuest = {
   integration?: PublicIntegration;
   /** Declared `contributes.filesystem` patterns, shown on the approval dialog. */
   filesystem?: string[];
+  /** Declared `contributes.origins`: the frame may exchange data with them once approved. */
+  origins?: string[];
   service?: PublicService;
   /** Declared `contributes.actions`; the UI shows them only for an active guest. */
   actions?: GuestActionContribution[];

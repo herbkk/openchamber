@@ -1340,7 +1340,7 @@ export const useUIStore = create<UIStore>()(
         sessionWorkEnabled: true,
         sessionWorkAutoOpen: true,
         sessionGoalEnabled: true,
-        sessionGoalChecker: 'classifier',
+        sessionGoalChecker: 'small-model',
         sessionGoalDefaultBudgetEnabled: false,
         sessionGoalDefaultBudget: 200_000,
         collapsibleThinkingBlocks: true,

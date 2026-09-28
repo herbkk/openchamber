@@ -41,10 +41,10 @@ const readGoalSettings = () => {
   const settings = readMergedSettingsSync({ fs, path, settingsFilePath: OPENCHAMBER_SETTINGS_FILE });
   return {
     enabled: settings.sessionGoalEnabled !== false,
-    // Who checks progress: the classification model unless the user picked
-    // the small model. Without a usable classification provider the small
-    // model checks either way.
-    checker: settings.sessionGoalChecker === 'small-model' ? 'small-model' : 'classifier',
+    // Who checks progress: the small model unless the user picked Jev here.
+    // A classification provider set up for another feature is not that pick.
+    // Without a usable classification provider the small model checks anyway.
+    checker: settings.sessionGoalChecker === 'classifier' ? 'classifier' : 'small-model',
   };
 };
 

@@ -59,7 +59,9 @@ Four things are decided here, in order:
 2. OpenChamber's settings override (Settings → Sessions → Small Model): when
    `smallModelUseDefault` is `false`, `smallModelOverride` wins —
    `source: 'settings'`.
-3. The small model of the session's provider (`preferredProviderID`) —
+3. The small model of the caller's provider (`preferredProviderID`: the
+   session's, or the composer's for commit messages, PR descriptions, spoken
+   summaries, the diff walkthrough and extensions) —
    `source: 'session-provider-small'` — found by `pickSmallModelInProvider`:
    the newest enabled, active, text-in text-out model of the first family in
    `SMALL_MODEL_FAMILY_PRIORITY` (`gpt-luna`, `gemini-flash-lite`,
@@ -76,11 +78,15 @@ Four things are decided here, in order:
    and finds none then takes the session's own model — `source:
    'session-model'`: costlier than a small model elsewhere, but never another
    provider's subscription.
-4. The small model of any provider OpenCode can call, same family order,
-   newest first — `source: 'small'`. Where callers without a session (commit
-   messages, spoken summaries) usually land.
-5. Otherwise `GET /api/model/default` — `source: 'default'`. This is
+4. Otherwise `GET /api/model/default` — `source: 'default'`. This is
    OpenCode's default chat model, not a small one; it is the last resort.
+
+There is deliberately no step that takes a small model from whichever other
+provider is connected. Until 2026-09 one existed (`source: 'small'`, after
+step 3); it sent diffs and replies to a provider the user never chose for
+them, and the walkthrough and extensions reached it without even passing
+their provider. Content goes only to the provider the user works with, the
+model they picked, or the default they configured.
 
 Claude Code (`claude-code`, from the opencode-claude plugin) is a provider
 like any other: its generate path runs a clean one-shot turn with no tools and

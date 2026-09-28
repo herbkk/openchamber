@@ -76,6 +76,8 @@ const requiredKeys = [
   'settings.extensions.capability.model.detail',
   'settings.extensions.capability.filesystem',
   'settings.extensions.capability.filesystem.detail',
+  'settings.extensions.capability.origins',
+  'settings.extensions.capability.origins.detail',
   'settings.extensions.capability.conversation',
   'settings.extensions.capability.conversation.detail',
   'settings.extensions.toast.approved',
