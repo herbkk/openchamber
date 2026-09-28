@@ -22,11 +22,11 @@ Sağlayıcı yoksa güvenlik ağı ve Auto gizlenir, oturumlar da yalnızca siz 
 
 ## Kurulum
 
-**Ayarlar → Provider'lar → Sınıflandırma sağlayıcıları** sayfasını açın ve Jev isteklerinin nereye gideceğini seçin. Beş seçenek var.
+Jev siz açana kadar kapalıdır: Bir sınıflandırma sağlayıcısı seçmediğiniz sürece konuşmalarınızdan hiçbir şey ona gitmez. **Ayarlar → Provider'lar → Sınıflandırma sağlayıcıları** sayfasını açın ve Jev isteklerinin nereye gideceğini seçin. **Kapalı** dışında beş seçenek var.
 
 ### OpenCode Zen kampanyası
 
-Sınırlı bir süre ücretsiz, anahtar gerekmez. Kampanya sürdüğü sürece OpenCode, OpenChamber'ın Jev'i OpenCode Zen üzerinden ücretsiz kullanmasına izin veriyor. Bu sayfaya hiç dokunmadıysanız zaten bunu kullanıyorsunuz.
+Sınırlı bir süre ücretsiz, anahtar gerekmez. Kampanya sürdüğü sürece OpenCode, OpenChamber'ın Jev'i OpenCode Zen üzerinden ücretsiz kullanmasına izin veriyor.
 
 Kampanya bittiğinde bu seçenek kaybolur ve varsa OpenChamber aşağıdaki anahtarlardan birine geçer.
 
@@ -66,7 +66,7 @@ Bir sağlayıcı çalıştığında **Ayarlar → Provider'lar** sayfasındaki k
 
 ## Seçiminiz çalışmayı bıraktığında
 
-Seçtiğiniz sağlayıcı kullanılamıyorsa (kampanya bitti, bir anahtar kaldırıldı), OpenChamber çalışan ilk sağlayıcıya geçer, önce kendi anahtarlarınız: TypeSafe anahtarı, sonra OpenRouter, sonra Vercel AI Gateway, sonra Zen anahtarı, sonra kampanya. Sayfa şu anda hangisinin kullanıldığını gösterir.
+Seçtiğiniz sağlayıcı kullanılamıyorsa (kampanya bitti, bir anahtar kaldırıldı), OpenChamber kendi anahtarlarınızdan çalışan ilkine geçer: TypeSafe anahtarı, sonra OpenRouter, sonra Vercel AI Gateway, sonra Zen anahtarı. Kampanyaya asla geçmez ve **Kapalı** kapalı kalır. Sayfa şu anda hangisinin kullanıldığını gösterir.
 
 Jev tek bir istekte yavaş kalırsa ya da hata verirse hiçbir şey bozulmaz. Her özelliğin bu durum için güvenli bir yanıtı vardır:
 

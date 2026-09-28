@@ -94,6 +94,7 @@ Auto. There is no env gate — the feature shipped dark behind
 The user picks a classification provider in Settings → Providers →
 Classification providers:
 
+- `off`: no Jev at all. Every Jev feature takes its no-provider path.
 - `zen-promo`: `opencode.ai/zen/v1/systemone` as `jev-1.13-free`, which OpenCode
   Zen answers with no credential at all. Usable while
   `ZEN_JEV_PROMOTION_ACTIVE` is true; flip it when OpenCode ends the promotion.
@@ -113,10 +114,15 @@ Classification providers:
 - `typesafe`: `api.typesafe.ai/v1/systemone` as `jev-latest` with the key saved
   in `routing-auth.json`. Saving a key also picks it.
 
-Without a stored pick the default is `typesafe` when a key is saved (it always
-won before the pick existed) and `zen-promo` otherwise. A pick that cannot be
-used falls back to the first usable source, own keys first (`typesafe`,
-`openrouter`, `vercel`, `zen-key`, `zen-promo`); none usable means no Jev.
+Jev reads conversation excerpts, so it is opt-in. Without a stored pick the
+default is `typesafe` when a key is saved (saving a key is choosing it, and it
+always won before the pick existed) and `off` otherwise. Until v2.0.3 the
+default was `zen-promo`, which sent every message of users who never opened
+this page to zen (#4109); an install without a stored pick now reads as `off`
+with no conversion. A pick that cannot be used falls back to the first usable
+key (`typesafe`, `openrouter`, `vercel`, `zen-key`); none usable means no Jev.
+`zen-promo` needs no credential, so it is never a fallback: only an explicit
+pick sends anything there, and `off` never falls back.
 The OpenCode keys are read on every request, so a key added or removed in
 OpenCode counts from the next request on.
 

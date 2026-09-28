@@ -116,6 +116,8 @@ import { createAgentMemoryActions } from './lib/agent-memory/actions.js';
 import { createMemoryProjectResolver } from './lib/agent-memory/project-resolution.js';
 import { isAgentMemoryFeatureAvailable } from './lib/agent-memory/feature-flag.js';
 import { createSpacesHost } from './lib/spaces/host.js';
+import { readIdleStopSetting, startIdleStop } from './lib/spaces/idle-stop.js';
+import { SPACE_IDLE_EXIT_CODE } from './lib/spaces/layout.js';
 import { createSwitchController, registerSpaceRoutes } from './lib/spaces/routes.js';
 import { resolvePrimaryWorktreeRoot } from './lib/git/service.js';
 import { createRemoteClientAuthRuntime } from './lib/client-auth/remote-clients.js';
@@ -1930,6 +1932,8 @@ async function main(options = {}) {
       const settings = await readSettingsFromDiskMigrated();
       return sanitizeProjects(settings?.projects || []).map((project) => project.path);
     },
+    readIdleStop: async () => readIdleStopSetting((await readSettingsFromDiskMigrated())?.isolatedSpacesIdleStop),
+    saveIdleStop: (setting) => persistSettings({ isolatedSpacesIdleStop: setting }),
   });
   const startupSettings = await readSettingsFromDiskMigrated().catch(() => null);
   if (startupSettings?.isolatedSpacesEnabled === true) {
@@ -2375,6 +2379,22 @@ async function main(options = {}) {
     void relayService.reconcile();
   }, 60_000);
   relayReconcileTimer.unref?.();
+
+  // The server inside an isolated space stops itself after the user's idle hours, and the space's
+  // container with it (DESIGN.md, decision 11). Only a space's environment names the setting's
+  // file, so this never runs anywhere else. The exit code tells the host why it stopped.
+  const spaceIdleStopFile = process.env.OPENCHAMBER_SPACE_IDLE_STOP_FILE;
+  if (spaceIdleStopFile) {
+    startIdleStop({
+      settingsPath: spaceIdleStopFile,
+      readSessionStates: () => sessionRuntime.getSessionStateSnapshot(),
+      readPendingRequests: () => sessionRuntime.getPendingBlockingRequestsSnapshot(),
+      stopSpace: async () => {
+        await gracefulShutdown({ exitProcess: false }).catch(() => {});
+        process.exit(SPACE_IDLE_EXIT_CODE);
+      },
+    });
+  }
 
   return {
     expressApp: app,

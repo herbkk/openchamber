@@ -22,11 +22,11 @@ Sem provedor, a rede de segurança e o Auto ficam ocultos, e as sessões só vã
 
 ## Configuração
 
-Abra **Configurações → Provedores → Provedores de classificação** e escolha para onde vão as solicitações ao Jev. Há cinco opções.
+O Jev fica desativado até você ativá-lo: nada das suas conversas vai para um provedor de classificação a menos que você escolha um. Abra **Configurações → Provedores → Provedores de classificação** e escolha para onde vão as solicitações ao Jev. Além de **Desativado**, há cinco opções.
 
 ### Promoção do OpenCode Zen
 
-Grátis por tempo limitado, sem chave. Enquanto a promoção durar, o OpenCode deixa o OpenChamber usar o Jev pelo OpenCode Zen sem custo. Se você nunca mexeu nesta página, é isso que já está usando.
+Grátis por tempo limitado, sem chave. Enquanto a promoção durar, o OpenCode deixa o OpenChamber usar o Jev pelo OpenCode Zen sem custo.
 
 Quando a promoção acabar, a opção some e o OpenChamber passa para uma das chaves abaixo, se você tiver alguma.
 
@@ -66,7 +66,7 @@ Assim que um provedor funciona, o cartão em **Configurações → Provedores** 
 
 ## Quando a sua escolha para de funcionar
 
-Se o provedor escolhido não puder ser usado (a promoção acabou, uma chave foi removida), o OpenChamber recorre ao primeiro que funcionar, suas próprias chaves primeiro: chave da TypeSafe, depois OpenRouter, depois Vercel AI Gateway, depois chave do Zen, depois a promoção. A página mostra qual está em uso agora.
+Se o provedor escolhido não puder ser usado (a promoção acabou, uma chave foi removida), o OpenChamber recorre à primeira das suas próprias chaves que funcionar: chave da TypeSafe, depois OpenRouter, depois Vercel AI Gateway, depois chave do Zen. Ele nunca recorre à promoção, e **Desativado** continua desativado. A página mostra qual está em uso agora.
 
 Se o Jev estiver lento ou falhar em uma solicitação, nada quebra. Cada função tem uma resposta segura para esse caso:
 

@@ -263,6 +263,12 @@ export const SETTINGS_REGISTRY = {
   // The isolated-spaces switch. The server reads it once at start; a change takes effect at the
   // next start, which the settings row says. Never shown in VS Code (decision 16 of the design).
   isolatedSpacesEnabled: field({ scope: 'instance', parse: parseBoolean, ui: uiStore('isolatedSpacesEnabled', (v) => useUIStore.getState().setIsolatedSpacesEnabled(v)) }),
+  // The idle stop of isolated spaces (decision 11). Written and read through the spaces route,
+  // which also tells the running spaces, so no store keeps a copy.
+  isolatedSpacesIdleStop: field({
+    scope: 'instance',
+    parse: fromSchema(z.object({ enabled: z.boolean(), hours: z.number().int().min(1).max(168) }).strict()),
+  }),
   // Server-owned: it says whether this build has the feature at all.
   agentMemoryFeatureAvailable: field({
     scope: 'instance',

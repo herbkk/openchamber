@@ -29,6 +29,8 @@ const ClassificationCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
   const { t } = useI18n();
   const available = useRoutingStore((state) => state.available);
   const jevAvailable = useRoutingStore((state) => state.jevAvailable);
+  // Off is a choice, not a problem to fix, so it gets no warning.
+  const off = useRoutingStore((state) => state.classifier?.selected === 'off');
   if (!available) return null;
   return (
     <SettingsCard
@@ -36,8 +38,10 @@ const ClassificationCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
       title={t('settings.classification.page.title')}
       subtitle="jev"
       badges={(
-        <SettingsCardPill tone={jevAvailable ? 'success' : 'warning'}>
-          {jevAvailable ? t('settings.classification.card.ready') : t('settings.classification.card.notSetUp')}
+        <SettingsCardPill tone={jevAvailable ? 'success' : off ? 'neutral' : 'warning'}>
+          {jevAvailable
+            ? t('settings.classification.card.ready')
+            : off ? t('settings.classification.card.off') : t('settings.classification.card.notSetUp')}
         </SettingsCardPill>
       )}
       footer={<span className="min-w-0 truncate">{t('settings.classification.card.usedFor')}</span>}

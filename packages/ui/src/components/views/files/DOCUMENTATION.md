@@ -61,12 +61,24 @@ through `getRuntimeUrlResolver().authenticatedAsset('/api/fs/raw', …)` with
 the scoped URL token; the server streams byte ranges so playback can seek.
 Images keep the object-URL/data-URL path.
 
+The Markdown preview renders the file's raw HTML the way GitHub does
+(`SimpleMarkdownRenderer allowRawHtml`): right after marked, a separate
+DOMPurify instance keeps a GitHub-like allowlist (`markdownSecurity.ts`:
+`picture`/`source`, `img`, `a`, `details`, `sub`/`sup`, `kbd`, aligned
+blocks) and drops author styles, classes, ids, data attributes, handlers,
+forms and embeds. Chat keeps raw HTML inert. A numeric `img height` becomes
+an inline height, because Tailwind preflight's `height: auto` would beat the
+attribute.
+
 `useMarkdownLocalAssets` makes a rendered Markdown file's relative images and
-links work: images are fetched through the runtime against the file's own
-directory (outside the workspace when the file is) and swapped for object
-URLs that are revoked with the preview; relative links open the target file
-through `useUIStore.openContextFile`, which the context panel and the mobile
-files surface both consume.
+links work: images and `srcset` candidates are fetched through the runtime
+against the file's own directory (outside the workspace when the file is) and
+swapped for object URLs that are revoked with the preview; relative links
+open the target file through `useUIStore.openContextFile`, which the context
+panel and the mobile files surface both consume. A `<source
+media="(prefers-color-scheme: …)">` follows the app theme, not the OS: the
+feature is rewritten to an always-true or never-true query and re-evaluated
+when the theme changes.
 
 An agent can ask for a file to be shown (`file.open` on the managed
 `openchamber` tool). The server broadcasts `openchamber:file-open-request`;

@@ -3,7 +3,7 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { applyGlobalBlockingRequestEvents, resetGlobalBlockingRequests } from '@/sync/global-blocking-requests';
 import { installHookTestDom } from '@/components/session/sidebar/test-utils/testDom';
-import { usePendingRequestCounts, type PendingRequestCounts } from './MobileSessionStateBadges';
+import { usePendingRequestCounts, type PendingRequestCounts } from './usePendingRequestCounts';
 
 const FAMILY = ['parent', 'child'] as const;
 

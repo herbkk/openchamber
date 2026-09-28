@@ -23,7 +23,8 @@ import type { MultiRunSummary } from '@/lib/multirun/runs';
 import { useUIStore } from '@/stores/useUIStore';
 import { formatRelativeShort, getSessionTimestamp } from './mobileSessionFields';
 import { MobileRunProviderLogos } from './MobileRunProviderLogos';
-import { MobileSessionGoalGlyph, MobileSessionPendingBadges, usePendingRequestCounts } from './MobileSessionStateBadges';
+import { MobileSessionGoalGlyph, MobileSessionPendingBadges } from './MobileSessionStateBadges';
+import { usePendingRequestCounts } from './usePendingRequestCounts';
 import { getSessionGoal } from '@/lib/sessionGoalMetadata';
 
 export type TimelineProject = MobileProjectIconProject & { label: string };

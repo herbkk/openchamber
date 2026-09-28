@@ -27,7 +27,7 @@ import {
   requireSpaceId,
   spaceResourceName,
 } from '../labels.js';
-import { SPACE_CONNECT_COMMAND, SPACE_USER, TOOLS_MOUNT_PATH } from '../layout.js';
+import { SPACE_CONNECT_COMMAND, SPACE_IDLE_EXIT_CODE, SPACE_USER, TOOLS_MOUNT_PATH } from '../layout.js';
 import { openCommandStream as openCommandStreamProcess } from '../run-command.js';
 import { createSpaceServerChannel, createSpaceToken } from '../space-server.js';
 import { CHANGE_TIMEOUT_MS, ROLLBACK_SETTLE_MS, createDockerEngine, entryLabels, entryName, isInterrupted, pause } from './docker-engine.js';
@@ -384,7 +384,11 @@ export function createDockerPlace({ runCommand, openCommandStream = openCommandS
       if (space && (!guard || (state === 'running' && guard.entry.State?.Running !== true))) {
         missing.push(spaceResourceName(id, ROLE_GATEKEEPER));
       }
-      return { id, name, project, created, state, orphans, damaged: missing.length > 0, missing };
+      // Since 5d-3: a space that stopped itself for the idle stop, told by its exit code, and whether
+      // its gatekeeper still runs, which the host stops when it finds one beside a stopped space.
+      const stoppedIdle = state === 'exited' && space.entry.State?.ExitCode === SPACE_IDLE_EXIT_CODE;
+      const gatekeeperRunning = guard?.entry.State?.Running === true;
+      return { id, name, project, created, state, stoppedIdle, gatekeeperRunning, orphans, damaged: missing.length > 0, missing };
     });
   };
 
@@ -400,7 +404,7 @@ export function createDockerPlace({ runCommand, openCommandStream = openCommandS
     const entry = await inspectOwnContainer(spaceId, spaceResourceName(spaceId, ROLE_GATEKEEPER));
     const address = String(entry?.NetworkSettings?.Networks?.[spaceResourceName(spaceId, ROLE_NETWORK)]?.IPAddress ?? '');
     if (net.isIP(address) === 0) {
-      throw new SpaceError('gatekeeper_address_unknown', `The runtime reports no address for the gatekeeper of space ${spaceId} on the space's network, so its listeners cannot be bound.`);
+      throw new SpaceError('gatekeeper_address_unknown', `The runtime reports no address for the network filter of space ${spaceId} on the space's network, so its listeners cannot be bound.`);
     }
     return address;
   };

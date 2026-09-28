@@ -110,7 +110,7 @@ export const ClassificationProvidersPage: React.FC<ClassificationProvidersPagePr
     }
   };
 
-  const status = !classifier
+  const status = !classifier || classifier.selected === 'off'
     ? null
     : classifier.effective === null
       ? t('settings.classification.status.none')
@@ -155,6 +155,12 @@ export const ClassificationProvidersPage: React.FC<ClassificationProvidersPagePr
           <div className={SETTINGS_FIELDS_STACK_CLASS}>
             {status ? <p className={SETTINGS_HELPER_CLASS}>{status}</p> : null}
             <SettingsRadioGroup aria-label={t('settings.classification.jev.title')}>
+              <SettingsRadioOption
+                selected={classifier.selected === 'off'}
+                onSelect={() => void pick('off')}
+                label={t('settings.classification.source.off.name')}
+                description={t('settings.classification.source.off.description')}
+              />
               {/* The promotion is offered only while it runs; after that it is not a choice. */}
               {promoUsable || classifier.selected === 'zen-promo' ? (
                 <SettingsRadioOption

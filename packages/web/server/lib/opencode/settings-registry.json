@@ -140,6 +140,9 @@
     "isolatedSpacesEnabled": {
       "scope": "instance"
     },
+    "isolatedSpacesIdleStop": {
+      "scope": "instance"
+    },
     "agentMemoryFeatureAvailable": {
       "scope": "instance",
       "computed": true

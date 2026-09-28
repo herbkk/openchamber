@@ -2,6 +2,7 @@ import { createRequire } from 'node:module';
 
 import { isAgentMemoryFeatureAvailable } from '../agent-memory/feature-flag.js';
 import { isPermissionMode } from '../permission-auto-accept/modes.js';
+import { idleStopSchema } from '../spaces/idle-stop.js';
 
 // Generated from packages/ui/src/lib/settings/registry.ts by
 // `bun run settings-registry:generate`; `registry.test.ts` fails when stale.
@@ -631,6 +632,9 @@ export const createSettingsHelpers = (dependencies) => {
     }
     if (typeof candidate.isolatedSpacesEnabled === 'boolean') {
       result.isolatedSpacesEnabled = candidate.isolatedSpacesEnabled;
+    }
+    if (idleStopSchema.safeParse(candidate.isolatedSpacesIdleStop).success) {
+      result.isolatedSpacesIdleStop = { ...candidate.isolatedSpacesIdleStop };
     }
     if (typeof candidate.openCodeUpdateToastDismissedVersion === 'string') {
       const version = candidate.openCodeUpdateToastDismissedVersion.trim();

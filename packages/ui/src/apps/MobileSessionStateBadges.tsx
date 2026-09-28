@@ -5,7 +5,7 @@ import { useI18n } from '@/lib/i18n';
 import type { Session } from '@/lib/opencode/model';
 import { getSessionGoal } from '@/lib/sessionGoalMetadata';
 import { sessionGoalStatusColor, sessionGoalStatusLabelKey } from '@/lib/sessionGoalPresentation';
-import { useGlobalBlockingRequestsStore } from '@/sync/global-blocking-requests';
+import type { PendingRequestCounts } from './usePendingRequestCounts';
 
 /** The goal glyph the desktop sidebar shows, tinted by the goal's status. */
 export const MobileSessionGoalGlyph: React.FC<{ session: Session }> = ({ session }) => {
@@ -22,28 +22,6 @@ export const MobileSessionGoalGlyph: React.FC<{ session: Session }> = ({ session
       aria-label={label}
     />
   );
-};
-
-export type PendingRequestCounts = { permissionCount: number; formCount: number };
-
-/**
- * Waiting permission and question requests for a row. Counts come from the
- * cross-directory request index, so a project the phone never opened still
- * shows them. `sessionIds` is the row's own session plus any subsessions it
- * hides: a subagent's request blocks the whole family.
- */
-export const usePendingRequestCounts = (sessionIds: readonly string[]): PendingRequestCounts => {
-  const permissionCount = useGlobalBlockingRequestsStore(React.useCallback((state) => {
-    let count = 0;
-    for (const id of sessionIds) count += state.bySession.get(id)?.permissions.length ?? 0;
-    return count;
-  }, [sessionIds]));
-  const formCount = useGlobalBlockingRequestsStore(React.useCallback((state) => {
-    let count = 0;
-    for (const id of sessionIds) count += state.bySession.get(id)?.forms.length ?? 0;
-    return count;
-  }, [sessionIds]));
-  return { permissionCount, formCount };
 };
 
 /** The permission and question badges the desktop sidebar shows. */

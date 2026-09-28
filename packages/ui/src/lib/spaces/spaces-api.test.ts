@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 
-import { createSpace, listSpaces, openSpaceDomain, readSpaceJournal, readSpacesSwitch, SpacesRequestError } from './spaces-api';
+import { createSpace, listSpaces, openSpaceDomain, readSpaceIdleStop, readSpaceJournal, readSpacesSwitch, setSpaceIdleStop, SpacesRequestError } from './spaces-api';
 
 const ID = 'a1b2c3d4e5f6';
 const originalFetch = globalThis.fetch;
@@ -46,6 +46,23 @@ describe('spaces-api', () => {
     answer(200, JSON.stringify({ spaces: [entry] }));
     const [space] = await listSpaces();
     expect(space).toMatchObject({ id: ID, state: 'preparing', step: 'checking_place', network: { mode: 'allowlist' } });
+  });
+
+  test('reads a space as not stopped for the idle stop unless the host says so', async () => {
+    answer(200, JSON.stringify({ spaces: [entry, { ...entry, state: 'exited', stoppedIdle: true }] }));
+    expect((await listSpaces()).map((space) => space.stoppedIdle)).toEqual([false, true]);
+  });
+
+  test('reads and changes the idle stop setting, and refuses one out of range as malformed', async () => {
+    answer(200, JSON.stringify({ enabled: true, hours: 4 }));
+    expect(await readSpaceIdleStop()).toEqual({ enabled: true, hours: 4 });
+    const seen = answer(200, JSON.stringify({ enabled: false, hours: 12 }));
+    expect(await setSpaceIdleStop({ enabled: false, hours: 12 })).toEqual({ enabled: false, hours: 12 });
+    expect(seen[0].method).toBe('PUT');
+    expect(new URL(seen[0].url).pathname).toBe('/api/openchamber/spaces/idle-stop');
+    expect(await seen[0].json()).toEqual({ enabled: false, hours: 12 });
+    answer(200, JSON.stringify({ enabled: true, hours: 500 }));
+    expect(await readSpaceIdleStop().catch((error: Error) => error)).toMatchObject({ code: 'space_answer_malformed' });
   });
 
   test('a refusal is thrown with the server\'s code, never answered as an empty list', async () => {

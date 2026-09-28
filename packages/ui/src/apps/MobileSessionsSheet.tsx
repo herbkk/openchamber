@@ -114,7 +114,8 @@ import { useCollapsedSessionActivityState } from '@/components/session/sidebar/s
 import type { SessionNode } from '@/components/session/sidebar/types';
 import { buildMultiRunIndex, type MultiRunSummary } from '@/lib/multirun/runs';
 import { MobileRunProviderLogos } from './MobileRunProviderLogos';
-import { MobileSessionGoalGlyph, MobileSessionPendingBadges, usePendingRequestCounts } from './MobileSessionStateBadges';
+import { MobileSessionGoalGlyph, MobileSessionPendingBadges } from './MobileSessionStateBadges';
+import { usePendingRequestCounts } from './usePendingRequestCounts';
 
 type MobileSessionsSheetProps = {
   open: boolean;
@@ -2206,11 +2207,12 @@ export const MobileSessionsSheet: React.FC<MobileSessionsSheetProps> = ({ open, 
                                 return (
                                   <div key={bucket.key}>
                                     <MobileSwipeActionsRow
-                                      // A space's swipe action is its grant dialog, where a worktree's is its deletion.
-                                      actionsWidth={48}
+                                      // A space's swipe actions are its grant dialog and its actions sheet, where a worktree's is its deletion.
+                                      actionsWidth={bucket.space ? 96 : 48}
                                       revealed={revealedRowId === `wt:${bucket.key}`}
                                       onRevealedChange={(nextRevealed) => handleRowKeyRevealedChange(`wt:${bucket.key}`, nextRevealed)}
                                       actions={bucket.space ? (
+                                        <>
                                         <button
                                           type="button"
                                           tabIndex={revealedRowId === `wt:${bucket.key}` ? 0 : -1}
@@ -2224,6 +2226,20 @@ export const MobileSessionsSheet: React.FC<MobileSessionsSheetProps> = ({ open, 
                                         >
                                           <Icon name="key" className="size-[18px]" />
                                         </button>
+                                        <button
+                                          type="button"
+                                          tabIndex={revealedRowId === `wt:${bucket.key}` ? 0 : -1}
+                                          className="flex flex-1 items-center justify-center text-foreground transition-colors active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                                          aria-label={t('spaces.actions.menuAria', { label: bucket.label })}
+                                          onClick={() => {
+                                            setRevealedRowId(null);
+                                            if (bucket.space) useSpacesStore.getState().openActionsSheet(bucket.space.id);
+                                          }}
+                                          style={{ touchAction: 'manipulation' }}
+                                        >
+                                          <Icon name="more-2" className="size-[18px]" />
+                                        </button>
+                                        </>
                                       ) : bucket.worktree ? (
                                         <button
                                           type="button"

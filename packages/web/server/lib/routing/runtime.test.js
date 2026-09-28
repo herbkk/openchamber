@@ -186,14 +186,18 @@ describe('jev endpoint', () => {
 });
 
 describe('resolveClassifier', () => {
-  it('defaults to a saved TypeSafe key, else the promotion', () => {
+  it('defaults to a saved TypeSafe key, else off', () => {
     expect(resolveClassifier({ selected: null, typesafeKey: 'k', zenKey: null, zenPromotionActive: true })).toMatchObject({ selected: 'typesafe', effective: 'typesafe' });
-    expect(resolveClassifier({ selected: null, typesafeKey: null, zenKey: null, zenPromotionActive: true })).toMatchObject({ selected: 'zen-promo', effective: 'zen-promo' });
+    expect(resolveClassifier({ selected: null, typesafeKey: null, zenKey: 'z', openrouterKey: 'o', zenPromotionActive: true })).toMatchObject({ selected: 'off', effective: null });
   });
 
-  it('falls back to the first usable source, own keys first, when the pick cannot be used', () => {
+  it('keeps off off, whatever is usable', () => {
+    expect(resolveClassifier({ selected: 'off', typesafeKey: 'k', zenKey: 'z', zenPromotionActive: true }).effective).toBeNull();
+  });
+
+  it('falls back to the first usable key when the pick cannot be used, never to the promotion', () => {
     expect(resolveClassifier({ selected: 'zen-promo', typesafeKey: null, zenKey: 'z', zenPromotionActive: false }).effective).toBe('zen-key');
-    expect(resolveClassifier({ selected: 'typesafe', typesafeKey: null, zenKey: null, zenPromotionActive: true }).effective).toBe('zen-promo');
+    expect(resolveClassifier({ selected: 'typesafe', typesafeKey: null, zenKey: null, zenPromotionActive: true }).effective).toBeNull();
     expect(resolveClassifier({ selected: 'zen-promo', typesafeKey: null, zenKey: null, zenPromotionActive: false }).effective).toBeNull();
     expect(resolveClassifier({ selected: 'zen-promo', typesafeKey: null, zenKey: 'z', vercelKey: 'v', zenPromotionActive: false }).effective).toBe('vercel');
     expect(resolveClassifier({ selected: 'vercel', typesafeKey: null, openrouterKey: 'o', zenPromotionActive: true }).effective).toBe('openrouter');
@@ -294,6 +298,8 @@ describe('classifier pick', () => {
     expect(store.writeClassifierSource).toHaveBeenCalledWith('zen-key');
     await runtime.setClassifierSource('openrouter');
     expect(store.writeClassifierSource).toHaveBeenCalledWith('openrouter');
+    await runtime.setClassifierSource('off');
+    expect(store.writeClassifierSource).toHaveBeenCalledWith('off');
     await expect(runtime.setClassifierSource('cloudflare')).rejects.toMatchObject({ status: 400 });
   });
 
@@ -307,10 +313,16 @@ describe('classifier pick', () => {
 describe('describe', () => {
   it('reports Auto ready with an enabled config, a fallback and two categories, key or no key', async () => {
     expect((await makeRuntime({ answers: {} }).runtime.describe())).toMatchObject({ autoReady: true, tokenPresent: true, jevSource: 'typesafe' });
-    // Without a key the free Jev model on zen answers, so Auto stays available.
-    expect((await makeRuntime({ token: null, answers: {} }).runtime.describe())).toMatchObject({ autoReady: true, jevAvailable: true, tokenPresent: false, jevSource: 'zen-free' });
+    // Without a key, a picked promotion answers, so Auto stays available.
+    expect((await makeRuntime({ token: null, classifierSource: 'zen-promo', answers: {} }).runtime.describe())).toMatchObject({ autoReady: true, jevAvailable: true, tokenPresent: false, jevSource: 'zen-free' });
+    // Nothing picked and no key: off, so no Jev and no Auto.
+    expect((await makeRuntime({ token: null, answers: {} }).runtime.describe())).toMatchObject({
+      autoReady: false,
+      jevAvailable: false,
+      classification: { selected: 'off', effective: null },
+    });
     // No usable classification provider: no Jev, so no Auto.
-    expect((await makeRuntime({ token: null, zenPromotionActive: false, answers: {} }).runtime.describe())).toMatchObject({
+    expect((await makeRuntime({ token: null, classifierSource: 'zen-promo', zenPromotionActive: false, answers: {} }).runtime.describe())).toMatchObject({
       autoReady: false,
       jevAvailable: false,
       classifier: { selected: 'zen-promo', effective: null },
@@ -321,9 +333,12 @@ describe('describe', () => {
   });
 
   it('keeps `classifier` parseable for v2.0.2 clients and puts the full picture in `classification`', async () => {
-    const zen = await makeRuntime({ token: null, answers: {} }).runtime.describe();
+    const zen = await makeRuntime({ token: null, classifierSource: 'zen-promo', answers: {} }).runtime.describe();
     expect(zen.classifier.sources.map((s) => s.id)).toEqual(['zen-promo', 'zen-key', 'typesafe']);
-    expect(zen.classification.sources.map((s) => s.id)).toEqual(['zen-promo', 'zen-key', 'openrouter', 'vercel', 'typesafe']);
+    expect(zen.classification.sources.map((s) => s.id)).toEqual(['off', 'zen-promo', 'zen-key', 'openrouter', 'vercel', 'typesafe']);
+
+    const off = await makeRuntime({ token: null, answers: {} }).runtime.describe();
+    expect(off.classifier).toBeNull();
 
     const routed = await makeRuntime({ classifierSource: 'openrouter', providerKeys: { openrouterKey: 'o' }, answers: {} }).runtime.describe();
     expect(routed.classifier).toBeNull();

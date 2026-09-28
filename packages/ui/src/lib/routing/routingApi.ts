@@ -37,8 +37,8 @@ const builtinCategorySchema = z.object({ id: z.string().min(1), name: z.string()
 /** Which Jev endpoint the server is calling: the user's TypeSafe key, or zen. */
 const jevSourceSchema = z.enum(['typesafe', 'zen-free']);
 
-/** A classification provider: which service answers Jev requests. */
-const classifierSourceSchema = z.enum(['zen-promo', 'zen-key', 'openrouter', 'vercel', 'typesafe']);
+/** A classification provider: which service answers Jev requests, or `off` for none. */
+const classifierSourceSchema = z.enum(['off', 'zen-promo', 'zen-key', 'openrouter', 'vercel', 'typesafe']);
 
 // A source this build does not know (a newer server) reads as no source and is
 // left out of the list, so it cannot fail the whole routing state.

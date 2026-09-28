@@ -3652,12 +3652,14 @@ export const FilesView: React.FC<FilesViewProps> = ({ mode = 'full', visible = t
     useUIStore.getState().openContextFile(root, absolutePath);
   }, [root]);
   const markdownLocalAssetsActive = isMarkdown && mdViewMode === 'preview' && !fileLoading;
+  const markdownColorScheme = currentTheme.metadata.variant === 'light' ? 'light' : 'dark';
   useMarkdownLocalAssets({
     container: mdPreviewNode,
     filePath: selectedFile?.path ?? null,
     workspaceRoot: root || null,
     onOpenFile: openLinkedFile,
     enabled: markdownLocalAssetsActive,
+    colorScheme: markdownColorScheme,
   });
   useMarkdownLocalAssets({
     container: mdFullscreenPreviewNode,
@@ -3665,6 +3667,7 @@ export const FilesView: React.FC<FilesViewProps> = ({ mode = 'full', visible = t
     workspaceRoot: root || null,
     onOpenFile: openLinkedFile,
     enabled: markdownLocalAssetsActive,
+    colorScheme: markdownColorScheme,
   });
   const shikiWorkerPool = useWorkerPool('unified');
   // Large code previews use the full draft with viewport virtualization and
@@ -4565,6 +4568,7 @@ export const FilesView: React.FC<FilesViewProps> = ({ mode = 'full', visible = t
                     className="typography-markdown-body"
                     stripFrontmatter
                     enableFileReferences={false}
+                    allowRawHtml
                   />
                 </ErrorBoundary>
               </div>
@@ -4948,6 +4952,7 @@ export const FilesView: React.FC<FilesViewProps> = ({ mode = 'full', visible = t
                   className="typography-markdown-body"
                   stripFrontmatter
                   enableFileReferences={false}
+                  allowRawHtml
                 />
               </ErrorBoundary>
             </div>

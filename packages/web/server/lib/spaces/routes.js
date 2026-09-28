@@ -33,6 +33,7 @@ const STATUS_BY_CODE = new Map([
   ['invalid_grant_request', 400],
   ['provider_not_supported', 400],
   ['invalid_domain', 400],
+  ['invalid_idle_stop', 400],
   ['network_is_open', 409],
   ['too_many_domains', 409],
   ['secret_source_missing', 409],
@@ -55,6 +56,7 @@ const STATUS_BY_CODE = new Map([
   ['nothing_to_apply', 409],
   ['place_cannot_restrict_network', 409],
   ['space_remove_incomplete', 502],
+  ['gatekeeper_missing', 409],
 ]);
 
 /** One JSON answer per failure, with a stable code. Details travel as data; a stack never does. */
@@ -172,6 +174,14 @@ export function registerSpaceRoutes(app, { getJourney, getPlaces = () => [], rea
     }
   });
 
+  // The idle stop setting (decision 11): kept in the settings and told to every running space.
+  app.get(`${SPACES_ROUTE}/idle-stop`, withJourney(async (journey, _req, res) => {
+    res.json(await journey.readIdleStopSetting());
+  }));
+  app.put(`${SPACES_ROUTE}/idle-stop`, withJourney(async (journey, req, res) => {
+    res.json(await journey.changeIdleStop(requireBody(req)));
+  }));
+
   // The places funnel: each place asked what it can do, now, because the user is looking.
   app.get(`${SPACES_ROUTE}/places`, withJourney(async (_journey, _req, res) => {
     const places = await Promise.all(getPlaces().map(async (place) => ({ id: place.id, ...(await place.check()) })));
@@ -193,6 +203,15 @@ export function registerSpaceRoutes(app, { getJourney, getPlaces = () => [], rea
 
   app.post(`${SPACES_ROUTE}/:id/stop`, withJourney(async (journey, req, res) => {
     res.json(await journey.stopSpace(spaceIdOf(req)));
+  }));
+
+  // The repair actions, from soft to hard: OpenCode inside, then the container with a fresh token.
+  app.post(`${SPACES_ROUTE}/:id/restart-opencode`, withJourney(async (journey, req, res) => {
+    res.json(await journey.restartOpenCode(spaceIdOf(req)));
+  }));
+
+  app.post(`${SPACES_ROUTE}/:id/restart`, withJourney(async (journey, req, res) => {
+    res.json(await journey.restartSpace(spaceIdOf(req)));
   }));
 
   app.delete(`${SPACES_ROUTE}/:id`, withJourney(async (journey, req, res) => {
