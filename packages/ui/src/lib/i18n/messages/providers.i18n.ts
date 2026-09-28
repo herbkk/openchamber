@@ -45,6 +45,13 @@ export const providersI18n = {
     'settings.providers.accounts.toast.renameFailed': 'Couldn’t rename the account',
   },
   nl: {
+    'settings.providers.enterpriseTitle': 'Enterprise-modus',
+    'settings.providers.enterpriseManagedBy': 'Beheerd door {organization}.',
+    'settings.providers.enterprisePolicyUnreadable': 'Het beleidsbestand op deze computer kon niet worden gelezen, dus de enterprise-modus blijft aan. Vraag uw beheerder het te controleren.',
+    'settings.providers.enterpriseMode': 'Providers worden beheerd in de OpenCode-configuratie, dus u kunt hier geen nieuwe verbinden. U kunt nog wel tussen bestaande accounts wisselen of ze verwijderen.',
+    'settings.providers.enterprisePolicyMissing': 'OpenCode heeft nog geen providerbeleid en kan dus nog elke bekende provider gebruiken, inclusief sleutels uit omgevingsvariabelen en ingebouwde providers.',
+    'settings.providers.enterprisePolicyConsole': 'Providerregels kunnen ook uit uw OpenCode Console-werkruimte komen. OpenChamber kan die niet lezen.',
+    'settings.providers.enterprisePolicyLink': 'Providers beperken met beleid',
     'settings.providers.grid.description': 'Modelproviders die OpenCode kan gebruiken. Open er een om de accounts en modellen te beheren.',
     'settings.providers.grid.searchPlaceholder': 'Providers zoeken',
     'settings.providers.grid.connect': 'Provider verbinden',

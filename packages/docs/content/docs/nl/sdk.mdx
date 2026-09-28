@@ -110,13 +110,13 @@ Een paneel tonen en de huidige sessie lezen vereist geen toestemming. Voor hande
 | `files` | bestanden in het geopende project lezen en schrijven via `readFile`, `writeFile`, `listDir` en `stat` met een relatief pad |
 | `model` | eenmalig tekst genereren met het Small Model via `generate`, buiten een sessie |
 
-Vier rechten worden automatisch toegevoegd: `network` bij een `integration`, `service` bij een `service`, `filesystem` bij `filesystem`-patronen en `conversation` als een sessieactie berichten opvraagt. Zie [Acties, opdrachten en de badge](#acties-opdrachten-en-de-badge).
+Vijf rechten worden automatisch toegevoegd: `network` bij een `integration`, `service` bij een `service`, `filesystem` bij `filesystem`-patronen, `origins` bij `origins` en `conversation` als een sessieactie berichten opvraagt. Zie [Acties, opdrachten en de badge](#acties-opdrachten-en-de-badge).
 
 Bij installatie ziet de gebruiker de volledige lijst en kan die goedkeuren of de extensie verwijderen. Vraagt een nieuwe versie meer, dan verschijnt het venster opnieuw. Een aanroep waarvoor een nog niet goedgekeurd recht nodig is, faalt met `NOT_GRANTED`.
 
 ## Tekst genereren
 
-Met het recht `model` vraagt `host.generate` het Small Model van de gebruiker om een eenmalig antwoord, zoals een samenvatting, titel of concepttekst. Niets komt in een sessie terecht, er wordt geen geschiedenis bewaard en de extensie kiest nooit zelf een provider. OpenChamber gebruikt hetzelfde model als voor eigen achtergrondtaken: ingesteld bij Instellingen → Sessies → Small Model, of automatisch gekozen uit aangemelde providers.
+Met het recht `model` vraagt `host.generate` het Small Model van de gebruiker om een eenmalig antwoord, zoals een samenvatting, titel of concepttekst. Niets komt in een sessie terecht, er wordt geen geschiedenis bewaard en de extensie kiest nooit zelf een provider. OpenChamber gebruikt hetzelfde model als voor eigen achtergrondtaken: het model uit Instellingen → Sessies → Small Model, het kleine model van de provider waarmee de gebruiker werkt, of het standaardmodel uit de OpenCode-configuratie.
 
 ```ts
 const { text } = await host.generate({
@@ -130,7 +130,17 @@ Zonder beschikbaar model faalt de aanroep met `NO_MODEL`; een modelfout geeft `M
 
 ## Accounts en netwerk
 
-Uw pagina draait in een sandbox en kan internet niet rechtstreeks aanroepen. Geef een `integration` op en laat OpenChamber via `host.request` verzoeken doen met het gebruikerstoken. Het token bereikt uw pagina nooit.
+Uw pagina draait in een sandbox en heeft zelf geen netwerktoegang. Scripts, stijlen, afbeeldingen, lettertypen en media worden alleen uit uw pakket geladen, en `fetch` kan alleen de bestanden van uw pakket bereiken. Lever lettertypen en afbeeldingen mee in het pakket in plaats van ze van een CDN te laden.
+
+Geef een `integration` op om met een externe dienst te communiceren. OpenChamber doet de verzoeken via `host.request` met het gebruikerstoken. Het token bereikt uw pagina nooit.
+
+Voor andere bronnen die uw pagina rechtstreeks nodig heeft, zoals lettertypen of afbeeldingen van een CDN of een openbare API, kunt u maximaal 8 https-origins opgeven:
+
+```json
+"origins": ["https://fonts.example.com"]
+```
+
+In het toestemmingsvenster ziet de gebruiker deze als adressen waarmee de extensie gegevens kan uitwisselen. Als een update een adres toevoegt, is opnieuw toestemming nodig. Goedgekeurde origins zijn toegankelijk voor `fetch`, afbeeldingen, lettertypen, stijlen en media, maar nooit voor scripts. Code moet in uw pakket zitten. De origin van de pagina is `null`, dus om een `fetch`-antwoord te kunnen lezen moet de server CORS voor die origin toestaan.
 
 - `token`: de gebruiker plakt een API-token op de integratiekaart. `apiOrigin` is de enige origin die `request` mag bereiken. `account` is optioneel en bevat een GET-pad en een veldnaam om het verbonden account te tonen. `scheme` bepaalt hoe het token wordt verstuurd; zie de tabel. Controleer in de provider-API-documentatie welke header vereist is.
 - `oauth`: de gebruiker plakt een client-ID en OpenChamber voert de autorisatieprocedure uit. Vereist `authorizeUrl`, `tokenUrl` en `apiOrigin`.

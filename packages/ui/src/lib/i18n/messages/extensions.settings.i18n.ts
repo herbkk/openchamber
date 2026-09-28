@@ -121,6 +121,8 @@ export const extensionsSettingsI18n = {
     'settings.extensions.toast.swapFailed': 'Could not replace the installed files. The previous version was kept.',
   },
   nl: {
+    'settings.extensions.capability.origins': 'Rechtstreeks gegevens versturen en ontvangen',
+    'settings.extensions.capability.origins.detail': 'De pagina\'s kunnen gegevens, inclusief wat ze tonen, met deze adressen uitwisselen:',
     'settings.extensions.actions.openSource': 'Broncode openen',
     'settings.extensions.builtIn.info': 'Wordt meegeleverd met OpenChamber en mee bijgewerkt met de app. De opgegeven toestemmingen worden automatisch verleend. Uitschakelen behoudt de gegevens en verbonden accounts.',
     'settings.extensions.toast.reservedId': 'Die extensie-ID is gereserveerd voor een ingebouwde extensie.',

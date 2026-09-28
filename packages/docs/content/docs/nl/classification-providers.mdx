@@ -22,7 +22,7 @@ Zonder provider zijn het vangnet en Auto verborgen. Sessies worden dan alleen na
 
 ## Instellen
 
-Jev staat uit totdat u het inschakelt. Er gaat niets uit uw gesprekken naar een classificatieprovider voordat u er een kiest. Open **Instellingen → Providers → Classificatieproviders** en kies waar Jev-verzoeken naartoe gaan. Naast **Uit** zijn er vijf opties.
+Jev staat uit totdat u het inschakelt. Er gaat niets uit uw gesprekken naar een classificatieprovider voordat u er een kiest. Open **Instellingen → Providers → Classificatieproviders** en kies waar Jev-verzoeken naartoe gaan. Naast **Uit** zijn er zes opties.
 
 ### OpenCode Zen-actie
 
@@ -62,11 +62,35 @@ Hiermee gebruikt u uw eigen TypeSafe-sleutel en gebruikslimiet.
 
 Door een sleutel op te slaan selecteert u deze meteen. De sleutel blijft in een eigen bestand op de OpenChamber-server en wordt nooit naar de browser gestuurd.
 
+### Aangepast adres
+
+Elke dienst die de System One API van TypeSafe ondersteunt, zoals een zelfgehoste gateway, een bedrijfsproxy of een provider die hier niet vermeld staat.
+
+1. Vul onder **Aangepast adres** de **Endpoint-URL** en het **Model** in, bijvoorbeeld `jev-latest`.
+2. Voeg een **API-sleutel** toe als de dienst die vereist. Deze wordt als `Bearer`-token verstuurd.
+3. Klik op **Opslaan**.
+
+U kunt de volledige URL met `/v1/systemone` aan het einde plakken, een OpenAI-achtige basis-URL met `/v1`, of de hoofd-URL van de API, zoals `https://api.typesafe.ai`. OpenChamber vult het ontbrekende deel aan en toont het exacte adres dat wordt aangeroepen. Alleen `http` en `https` worden ondersteund. De sleutel hoort in het eigen veld, nooit in de URL.
+
+Opslaan selecteert ook het adres. Net als de TypeSafe-sleutel blijven het adres en de bijbehorende sleutel in een eigen bestand op de OpenChamber-server. De sleutel wordt nooit naar de browser gestuurd.
+
+Een server kan het adres ook uit omgevingsvariabelen halen. Dat is handig als u OpenChamber voor een team inricht:
+
+```bash
+OPENCHAMBER_JEV_URL=https://jev.example.com/v1
+OPENCHAMBER_JEV_MODEL=jev-latest        # optional, this is the default
+OPENCHAMBER_JEV_API_KEY=...             # optional
+```
+
+Zet op beheerde laptops hetzelfde adres onder `jev` in het [beleidsbestand op de computer](/nl/security/#een-beleidsbestand-op-de-computer). Dat krijgt voorrang op de omgevingsvariabelen.
+
+In beide gevallen vervangt dit het adres uit Instellingen. Het verschijnt daar wel, maar kan niet worden bewerkt. In [enterprise-modus](/nl/security/#enterprise-modus) is dit naast **Uit** de enige toegestane Jev-bron en wordt deze standaard geselecteerd.
+
 De kaart bij **Instellingen → Providers** toont **Gereed** zodra een provider werkt.
 
 ## Als uw keuze niet meer werkt
 
-Kan de gekozen provider niet worden gebruikt, bijvoorbeeld omdat de actie is afgelopen of een sleutel is verwijderd, dan kiest OpenChamber de eerste bruikbare eigen sleutel in deze volgorde: TypeSafe, OpenRouter, Vercel AI Gateway en Zen. Het valt nooit terug op de actie, en **Uit** blijft uit. De pagina laat zien welke provider momenteel wordt gebruikt.
+Kan de gekozen provider niet worden gebruikt, bijvoorbeeld omdat de actie is afgelopen of een sleutel is verwijderd, dan kiest OpenChamber de eerste bruikbare eigen optie in deze volgorde: TypeSafe-sleutel, uw aangepaste adres, OpenRouter, Vercel AI Gateway en Zen-sleutel. Het valt nooit terug op de actie, en **Uit** blijft uit. De pagina laat zien welke provider momenteel wordt gebruikt.
 
 Als Jev bij één verzoek traag is of faalt, blijft de app werken. Elke functie heeft daarvoor een veilige terugval:
 
@@ -79,7 +103,7 @@ Als Jev bij één verzoek traag is of faalt, blijft de app werken. Elke functie 
 
 Jev ontvangt korte fragmenten uit uw gesprek: uw laatste bericht en, ter context, maximaal drie eerdere beurten, elk ingekort tot de eerste paar honderd tekens. Voor het vangnet ontvangt het ook de te beoordelen actie zoals OpenCode die beschrijft: de opdracht die de agent wil uitvoeren, of het bestand en de wijziging bij een bewerking. Het krijgt nooit volledige bestanden of afbeeldingen.
 
-Verzoeken gaan rechtstreeks van de OpenChamber-server naar OpenCode Zen, OpenRouter, Vercel AI Gateway of TypeSafe, afhankelijk van uw keuze.
+Verzoeken gaan rechtstreeks van de OpenChamber-server naar OpenCode Zen, OpenRouter, Vercel AI Gateway, TypeSafe of uw aangepaste adres, afhankelijk van uw keuze.
 
 ## Waar werkt het?
 

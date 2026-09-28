@@ -44,6 +44,7 @@ export const webSearchI18n = {
     'settings.webSearch.toast.keyRemoveFailed': 'Couldn\'t remove the key.',
   },
   nl: {
+    'settings.webSearch.keys.enterpriseMode': 'In enterprise-modus komen zoeksleutels uit de OpenCode-configuratie of omgevingsvariabelen. U kunt een opgeslagen sleutel nog wel verwijderen.',
     'chat.webSearch.noResults': 'Geen resultaten gevonden.',
     'chat.webSearch.provider': 'Gezocht met {provider}',
     'chat.webSearchConsent.title': 'Webzoeken toestaan?',
